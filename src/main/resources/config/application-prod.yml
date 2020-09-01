@@ -1,0 +1,51 @@
+
+eureka:
+  client:
+    enabled: true
+    fetch-registry: true
+    register-with-eureka: true
+    serviceUrl:
+      defaultZone: http://prod:prod@172.17.153.1830:8761/eureka/,http://prod:prod@172.17.232.1680:8761/eureka/
+
+spring:
+  redis:
+    sentinel:
+      master: mymaster
+      nodes: 172.17.153.1830:26379,172.17.232.1680:26379,172.17.232.1670:26379
+    password: xluniccc
+    database: 2
+    lettuce:
+      pool:
+        max-active: 50
+        max-wait: -1
+        max-idle: 20
+        min-idle: 10
+  rabbitmq:
+    publisher-confirms: true
+    host: 172.17.232.167
+    port: 5672
+    username: xl
+    password: root
+    listener:
+      direct:
+        acknowledge-mode: manual
+      simple:
+        acknowledge-mode: manual
+    virtual-host: /
+
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  local:
+    default:
+      type: caffeine
+      limit: 100
+      keyConvertor: fastjson
+      expireAfterWriteInMillis: 100000
+  remote:
+    default:
+      type: redis.lettuce
+      keyConvertor: fastjson
+      valueEncoder: kryo
+      valueDecoder: kryo
+      uri: redis-sentinel://xluniccc@172.17.153.180:26379,172.17.232.1680:26379,172.17.232.1680:26379/3?sentinelMasterId=mymaster
