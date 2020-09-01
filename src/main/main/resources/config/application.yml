@@ -1,0 +1,72 @@
+server:
+  port: 8021
+  undertow:
+    io-threads: 8
+    worker-threads: 64
+    buffer-size: 1024
+    direct-buffers: true
+
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+  hystrix:
+    enabled: true
+
+#负载均衡
+ribbon:
+  eureka:
+    enabled: true
+
+spring:
+  application:
+    name: xl-authentication
+  profiles:
+    active: dev
+  jackson:
+    serialization.indent_output: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+      enabled: true
+  cloud:
+    stream:
+      bindings:
+        jwtClear:
+          content-type: application/json
+          destination: jwt.clear
+          group: group
+        banUser:
+          content-type: application/json
+          destination: ban.user
+          group: group
+logging:
+  level:
+    org.springframework.web: debug
+    org.springframework.security: DEBUG
+    com.uniccc.authentication: DEBUG
+  file: /data/logs/xl-authentication/xl-authen.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n"
+system:
+  security:
+    authentication:
+      jwt:
+        base64Secret: ZGRhNDkyZDIxOTFiZGUxMjZmNDk3NjlhNzU0MjdkMWRjMDhjNjg0MmEzNzU1MDg0MTlhZGQ1ZGZmNDUzNWQ0NmYyOTk2YTczYjA2MzBmYzg2OWY2ODg5M2E4YmMxNDYxZGIwMTQ4ODI4NmIwNmUyZTRiM2YzOTFhMDI0NjJmZWU=
+        tokenValidity: 12
+
+#Eureka相关配置
+eureka:
+  client:
+    instance-info-replication-interval-seconds: 5 #复制实例变化信息到eureka服务器所需要的时间间隔（s），默认为30秒
+    registry-fetch-interval-seconds: 5 #从Eureka服务器端获取注册信息的间隔时间，单位：秒
+  instance:
+    prefer-ip-address: true
+    instanceId: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+    lease-renewal-interval-in-seconds: 5 # eureka客户需要多长时间发送心跳给eureka服务器，表明它仍然活着,默认为30 秒
+    lease-expiration-duration-in-seconds: 10 #Eureka服务器在接收到实例的最后一次发出的心跳后，需要等待多久才可以将此实例删除，默认为90秒
+#        status-page-url-path: ${spring.management.context-path}/info
+#        health-check-url-path: ${spring.management.context-path}/health
